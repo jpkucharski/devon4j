@@ -18,3 +18,56 @@ On the other hand to build and deploy your application you want a final artifact
 == Package Structure
 
 The package structure of your code inside `src/main/java` (and `src/test/java`) of your modules is described in our coding conventions in the sections link:coding-conventions.asciidoc#packages[packages] and link:coding-conventions.asciidoc#architecture-mapping[architecture-mapping].
+
+== CI-friendly Maven
+
+Project structure: parent child with additional  usage of `.mvn/maven.config` file. 
+In `.mvn/maven.config` we declared default `${revision}` and `${changelist}` parameters.
+
+W can divide  `.pom` file between parent and child  to make it more flexible and CI- friendly where child is inheriting parent properties placed in
+`<properties> … </properties>`  section.
+
+To define variable we need to use `${revision}` pattern. 
+We will use predefined variables that are allowed  in maven structure like: 
+
+  ${revision}
+  ${changelist}
+  ${project.artifactId}
+  ${spring.boot.version}
+
+from `devon4j/pom.xml` and `.mvn/maven.config`
+
+To declare a parent you need to use `<parent>…</parent>`
+and to declare child use `<modules>…</modules>`
+
+Example from `dev4j/pom.xml`: 
+
+  <project>
+  ...
+    <parent>
+     <groupId>com.devonfw</groupId>
+     <artifactId>maven-parent</artifactId>
+     <version>6</version>
+   </parent>
+   ...
+   <modules>
+     <module>boms</module>
+     <module>modules</module>
+     <module>starters</module>
+     <module>templates</module>
+     <module>documentation</module>
+   </modules>
+   ...
+   <properties>
+     <revision>dev</revision>
+     <changelist>-SNAPSHOT</changelist>
+     <github.repository>devon4j</github.repository>
+     <devon4j.version>${revision}${changelist}</devon4j.version>
+     <spring.boot.version>2.4.0</spring.boot.version>
+     ...
+    </properties>
+  ...
+  </project>
+
+This declarations of parent child’s relationship is an example for usage of multilevel inheritance of the properties. 
+In this case we are able to see that the actual file is using `com.devonfw`  as a parent for variables like `${revision}` and `${changelist}` and them will be passed through to chids declared in `<modules> …</modules>` section: `boms, modules, starters, tamplates` and  `documentation` `pom.xml` files.
