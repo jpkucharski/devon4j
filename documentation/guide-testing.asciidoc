@@ -234,9 +234,19 @@ import static org.mockito.Mockito.mock;
 ...
 
 public class StaffmanagementImplTest extends ModuleTest {
-  @Rule
-  public MockitoRule rule = MockitoJUnit.rule();
 
+  @InjectMocks
+	private StaffmanagementImpl staffMangementImpl = new StaffmanagementImp();
+  @Mock 
+  private ClusterData clusterdata;
+  
+  @BeforeEach
+  void setUp() {
+    MockitoAnnotations.initMocks(this);
+    clusterData = new ClusterDataEto();
+    clusterData.setId(Long.valueOf(1));
+  ...}
+  
   @Test
   public void testFindStaffMember() {
   ...}
@@ -244,7 +254,8 @@ public class StaffmanagementImplTest extends ModuleTest {
 -------------------------------------------
 
 Note that the test class does not use the `@SpringApplicationConfiguration` annotation. In a module test one does not use the whole application.
-The JUnit rule is the best solution to use in order to get all needed functionality of Mockito. Static imports are a convenient option to enhance readability within Mockito tests.
+I JUnit5 there was introduced @BeforeEach and @AfterEach annotation that is allowing to create a rule that will be invoked before and after each Test.
+Static imports are a convenient option to enhance readability within Mockito tests.
 You can define mocks with the `@Mock` annotation or the `mock(*.class)` call. To inject the mocked objects into your class under test you can use the `@InjectMocks` annotation. This automatically uses the setters of `StaffmanagementImpl` to inject the defined mocks into the _class under test (CUT)_ when there is a setter available. In this case the `beanMapper` and the `staffMemberDao` are injected. Of course it is possible to do this manually if you need more control. 
 
 [source,java]
